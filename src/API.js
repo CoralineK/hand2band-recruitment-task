@@ -25,7 +25,7 @@ const unsplash = new Unsplash({
   accessKey: secret.accessKey,
 });
 
-export const searchPhotos = (query, page) =>
+export const searchPhotos = (query, page = 1) =>
   unsplash.search
     .photos(query, page, 9)
     .then(toJson)

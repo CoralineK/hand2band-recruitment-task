@@ -65,24 +65,38 @@ export default function CustomizedInputBase() {
     if (state.query.length >= 3) {
       promptTopics(state.query).then((data) => action.setTopicsList(data));
     } else {
-      promptTopics('').then((data) => action.setTopicsList(data));
+      action.setTopicsList([]);
     }
   }, [state.query]);
 
+  const findPhotos = (query) => {
+    searchPhotos(query).then((result) => {
+      action.setPhotos(result);
+      action.setSubmitted(true);
+      action.setTitle(query);
+      action.setPath('/results');
+      history.push('/results');
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    findPhotos(state.query);
+  };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    findPhotos(e.target.value);
+  };
+
+  const handleOnChange = (e) => {
+    action.setQuery(e.target.value);
+    action.setSubmitted(false);
+  };
+
   return (
     <>
-      <Form
-        onSubmit={(e) => {
-          e.preventDefault();
-          searchPhotos(state.query, 1).then((result) => {
-            action.setPhotos(result);
-            action.setSubmitted(true);
-            action.setTitle(state.query);
-            action.setPath('/results');
-            history.push('/results');
-          });
-        }}
-      >
+      <Form onSubmit={handleSubmit}>
         <Paper
           className={`${classes.root} ${
             state.path === '/results' && classes.results
@@ -100,10 +114,7 @@ export default function CustomizedInputBase() {
             placeholder="Search free high-resolution photos"
             inputProps={{ 'aria-label': 'search photos' }}
             value={state.query}
-            onChange={(e) => {
-              action.setQuery(e.target.value);
-              action.setSubmitted(false);
-            }}
+            onChange={handleOnChange}
           />
         </Paper>
         {state.submitted === false && (
@@ -116,16 +127,7 @@ export default function CustomizedInputBase() {
                 type="submit"
                 key={topic}
                 value={topic}
-                onClick={(e) => {
-                  e.preventDefault();
-                  searchPhotos(e.target.value).then((result) => {
-                    action.setPhotos(result);
-                    action.setSubmitted(true);
-                    action.setTitle(e.target.value);
-                    action.setPath('/results');
-                    history.push('/results');
-                  });
-                }}
+                onClick={handleClick}
               />
             ))}
           </TopicsContainer>
